@@ -74,6 +74,8 @@
                 <li>Deploy more personal and academic projects online</li>
             </ul>
         </section>
+        <button onclick="showMessage()">Click Me</button>
+<p id="message"></p>
     </main>
 <section class="card">
     <h2>Tools Used</h2>
@@ -92,6 +94,10 @@ function scrollToTop() {
         top: 0,
         behavior: "smooth"
     });
+}
+
+function showMessage() {
+    document.getElementById("message").innerText = "Thanks for visiting my website!";
 }
 </script>
 </body>
