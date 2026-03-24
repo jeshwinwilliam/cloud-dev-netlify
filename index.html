@@ -1,125 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeshwin William James | Cloud Development</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeshwin William James | Neon + Netlify Assignment</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
-<header class="hero">
+  <header class="hero">
     <nav class="nav">
-        <div class="brand">JWJ</div>
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#interests">Interests</a></li>
-            <li><a href="#goals">Goals</a></li>
-        </ul>
+      <div class="brand">JWJ</div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#database">Database</a></li>
+      </ul>
     </nav>
 
     <section class="hero-content">
-        <p class="tag">CSCI 6343 • Cloud Development • Spring 2026</p>
-        <h1>Hello, I'm Jeshwin William James</h1>
-        <p class="intro">
-            Welcome to my first cloud development site. This page is a simple personal website
-            created for Lab 1 and deployed using GitHub and Netlify.
-        </p>
-        <a class="button" href="#about">Explore My Site</a>
+      <p class="tag">CSCI 6343 • Cloud Development • Spring 2026</p>
+      <h1>Netlify + Neon Visitors App</h1>
+      <p class="intro">
+        This site connects a Netlify frontend to a Neon PostgreSQL database through
+        Netlify serverless functions. It supports POST, GET, and DELETE operations.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="#visitor-app">Test the Visitors App</a>
+        <a class="button secondary" href="downloads/get-visitors.js" download>Download get-visitors.js</a>
+      </div>
     </section>
-</header>
+  </header>
 
-<main>
+  <main>
+    <section id="about" class="card">
+      <h2>About This Assignment</h2>
+      <p>
+        The homepage stays visible as a normal static site, and it also includes a direct
+        download link for <strong>get-visitors.js</strong>. This matches the updated homework
+        requirement to show <strong>index.html</strong> while also providing a downloadable link
+        for the API file.
+      </p>
+    </section>
 
-<section id="about" class="card">
-<h2>About Me</h2>
-<p>
-I am a student who is interested in software development, cloud technologies,
-and building practical web applications. I enjoy learning by creating projects
-and improving them step by step.
-</p>
-</section>
+    <section id="api" class="card">
+      <h2>API Endpoints</h2>
+      <ul class="goals api-list">
+        <li><code>GET /.netlify/functions/get-visitors</code></li>
+        <li><code>POST /.netlify/functions/add-visitor</code></li>
+        <li><code>DELETE /.netlify/functions/delete-visitor?id=VISITOR_ID</code></li>
+      </ul>
+      <p class="small-note">
+        After deployment, replace the relative paths with your full Netlify site URL when you submit.
+      </p>
+    </section>
 
-<section id="interests" class="card">
-<h2>My Interests</h2>
+    <section id="database" class="card">
+      <h2>Database Table</h2>
+      <p>Run the SQL below once inside Neon SQL Editor:</p>
+      <pre><code>CREATE TABLE IF NOT EXISTS visitors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+    </section>
 
-<div class="grid">
+    <section id="visitor-app" class="card">
+      <h2>Visitors App</h2>
+      <p>Add a visitor, load all visitors, or delete a visitor from the database.</p>
 
-<article>
-<h3>Web Development</h3>
-<p>
-I like building responsive websites and learning how frontend and backend
-systems work together.
-</p>
-</article>
+      <form id="visitor-form" class="visitor-form">
+        <input type="text" id="visitor-name" placeholder="Enter visitor name" maxlength="100" required>
+        <button type="submit" class="button form-button">Add Visitor</button>
+      </form>
 
-<article>
-<h3>Cloud Computing</h3>
-<p>
-I am interested in how applications are deployed, scaled, and managed
-using modern cloud platforms and DevOps workflows.
-</p>
-</article>
+      <div class="action-row">
+        <button id="load-visitors" class="button form-button" type="button">Load Visitors</button>
+      </div>
 
-<article>
-<h3>Continuous Deployment</h3>
-<p>
-This assignment helped me understand how pushing code to GitHub can
-automatically trigger a live deployment through Netlify.
-</p>
-</article>
+      <p id="status-message" class="status-message"></p>
+      <ul id="visitor-list" class="visitor-list"></ul>
+    </section>
+  </main>
 
-</div>
-</section>
+  <button id="topBtn" type="button">Back to Top</button>
 
-<section id="goals" class="card">
-<h2>My Learning Goals</h2>
+  <footer class="footer">
+    <p>Created by Jeshwin William James for CSCI 6343 - Cloud Development</p>
+  </footer>
 
-<ul class="goals">
-<li>Build a strong foundation in cloud development tools</li>
-<li>Practice Git and GitHub version control regularly</li>
-<li>Deploy more personal and academic projects online</li>
-</ul>
+  <script>
+    const visitorForm = document.getElementById('visitor-form');
+    const visitorNameInput = document.getElementById('visitor-name');
+    const loadVisitorsButton = document.getElementById('load-visitors');
+    const visitorList = document.getElementById('visitor-list');
+    const statusMessage = document.getElementById('status-message');
+    const topBtn = document.getElementById('topBtn');
 
-</section>
+    function setStatus(message, isError = false) {
+      statusMessage.textContent = message;
+      statusMessage.style.color = isError ? '#b91c1c' : '#065f46';
+    }
 
-<section class="card">
-<h2>Tools Used</h2>
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    }
 
-<ul class="goals">
-<li>Git and GitHub for version control</li>
-<li>Netlify for deployment</li>
-<li>HTML and CSS for building the site</li>
-</ul>
+    async function loadVisitors() {
+      try {
+        setStatus('Loading visitors...');
+        const response = await fetch('/.netlify/functions/get-visitors');
+        const visitors = await response.json();
 
-</section>
+        if (!response.ok) {
+          throw new Error(visitors.error || 'Unable to load visitors.');
+        }
 
-<button onclick="showMessage()">Click Me</button>
-<p id="message"></p>
+        visitorList.innerHTML = '';
 
-</main>
+        if (visitors.length === 0) {
+          visitorList.innerHTML = '<li class="empty-state">No visitors in the database yet.</li>';
+          setStatus('No visitors found.');
+          return;
+        }
 
-<button id="topBtn" onclick="scrollToTop()">Back to Top</button>
+        visitors.forEach((visitor) => {
+          const item = document.createElement('li');
+          item.className = 'visitor-item';
+          item.innerHTML = `
+            <div>
+              <strong>${visitor.name}</strong>
+              <p>Visited at: ${formatDate(visitor.visited_at)}</p>
+              <p>ID: ${visitor.id}</p>
+            </div>
+            <button class="delete-btn" data-id="${visitor.id}" type="button">Delete</button>
+          `;
+          visitorList.appendChild(item);
+        });
 
-<footer class="footer">
-<p>Created by Jeshwin William James for CSCI 6343 - Cloud Development</p>
-</footer>
+        setStatus('Visitors loaded successfully.');
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
 
-<script>
+    visitorForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
 
-function scrollToTop() {
-window.scrollTo({
-top: 0,
-behavior: "smooth"
-});
-}
+      try {
+        const name = visitorNameInput.value.trim();
 
-function showMessage() {
-document.getElementById("message").innerText = "Thanks for visiting my website!";
-}
+        if (!name) {
+          setStatus('Please enter a visitor name.', true);
+          return;
+        }
 
-</script>
+        setStatus('Adding visitor...');
 
+        const response = await fetch('/.netlify/functions/add-visitor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Unable to add visitor.');
+        }
+
+        visitorNameInput.value = '';
+        setStatus(`Visitor added: ${result.name}`);
+        await loadVisitors();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+
+    loadVisitorsButton.addEventListener('click', loadVisitors);
+
+    visitorList.addEventListener('click', async function (event) {
+      if (!event.target.classList.contains('delete-btn')) return;
+
+      const visitorId = event.target.getAttribute('data-id');
+
+      try {
+        setStatus('Deleting visitor...');
+        const response = await fetch(`/.netlify/functions/delete-visitor?id=${visitorId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Unable to delete visitor.');
+        }
+
+        setStatus(result.message || 'Visitor deleted successfully.');
+        await loadVisitors();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+
+    topBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
 </body>
 </html>

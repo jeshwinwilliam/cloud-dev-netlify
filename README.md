@@ -1,17 +1,27 @@
 # cloud-dev-netlify
 
-Personal site for Lab 1 / Homework 1 for CSCI 6343 - Cloud Development.
+Cloud Development assignment using Netlify + Neon PostgreSQL.
+
+## Features
+- Static homepage deployed on Netlify
+- Neon PostgreSQL database connection
+- Netlify Functions for GET, POST, and DELETE
+- Downloadable `get-visitors.js` link shown on the homepage
 
 ## Files
-- `index.html` - main webpage
-- `styles.css` - styling for the webpage
+- `index.html` - homepage UI
+- `styles.css` - page styling
+- `downloads/get-visitors.js` - downloadable source file linked from homepage
+- `netlify/functions/get-visitors.js` - GET API
+- `netlify/functions/add-visitor.js` - POST API
+- `netlify/functions/delete-visitor.js` - DELETE API
+- `setup.sql` - create the visitors table
+- `netlify.toml` - Netlify config
+- `package.json` - project dependencies
 
-## Suggested commit sequence
-1. `Add initial homepage structure`
-2. `Add external stylesheet and improve layout`
-3. `Add about section and learning goals`
-
-## Deploy
-Connect this repository to Netlify and set:
+## Deploy settings
 - Build command: leave blank
 - Publish directory: `.`
+
+## Required Netlify environment variable
+- `DATABASE_URL` = your Neon PostgreSQL connection string
