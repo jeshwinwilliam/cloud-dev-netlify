@@ -7,161 +7,207 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="hero">
+    <nav class="nav">
+      <div class="brand">JWJ</div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#database">Database</a></li>
+      </ul>
+    </nav>
 
-<header class="hero">
-  <nav class="nav">
-    <div class="brand">JWJ</div>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#visitor-app">Visitors</a></li>
-    </ul>
-  </nav>
+    <section class="hero-content">
+      <p class="tag">CSCI 6343 • Cloud Development • Spring 2026</p>
+      <h1>Netlify + Neon Visitors App</h1>
+      <p class="intro">
+        This site connects a Netlify frontend to a Neon PostgreSQL database through
+        Netlify serverless functions. It supports POST, GET, and DELETE operations.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="#visitor-app">Test the Visitors App</a>
+        <a class="button secondary" href="downloads/get-visitors.js" download>Download get-visitors.js</a>
+      </div>
+    </section>
+  </header>
 
-  <section class="hero-content">
-    <p class="tag">CSCI 6343 • Cloud Development</p>
-    <h1>Netlify + Neon Visitors App</h1>
+  <main>
+    <section id="about" class="card">
+      <h2>About This Assignment</h2>
+      <p>
+        The homepage stays visible as a normal static site, and it also includes a direct
+        download link for <strong>get-visitors.js</strong>. This matches the updated homework
+        requirement to show <strong>index.html</strong> while also providing a downloadable link
+        for the API file.
+      </p>
+    </section>
 
-    <p class="intro">
-      This site connects Netlify serverless functions to a Neon PostgreSQL
-      database. It supports POST, GET and DELETE operations.
-    </p>
+    <section id="api" class="card">
+      <h2>API Endpoints</h2>
+      <ul class="goals api-list">
+        <li><code>GET /.netlify/functions/get-visitors</code></li>
+        <li><code>POST /.netlify/functions/add-visitor</code></li>
+        <li><code>DELETE /.netlify/functions/delete-visitor?id=VISITOR_ID</code></li>
+      </ul>
+      <p class="small-note">
+        After deployment, replace the relative paths with your full Netlify site URL when you submit.
+      </p>
+    </section>
 
-    <div class="hero-actions">
-      <a class="button" href="#visitor-app">Test Visitors</a>
+    <section id="database" class="card">
+      <h2>Database Table</h2>
+      <p>Run the SQL below once inside Neon SQL Editor:</p>
+      <pre><code>CREATE TABLE IF NOT EXISTS visitors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+    </section>
 
-      <!-- DOWNLOAD BUTTON -->
-      <a class="button secondary"
-         href="/downloads/get-visitors.js"
-         download>
-         Download get-visitors.js
-      </a>
-    </div>
-  </section>
-</header>
+    <section id="visitor-app" class="card">
+      <h2>Visitors App</h2>
+      <p>Add a visitor, load all visitors, or delete a visitor from the database.</p>
 
-<main>
+      <form id="visitor-form" class="visitor-form">
+        <input type="text" id="visitor-name" placeholder="Enter visitor name" maxlength="100" required>
+        <button type="submit" class="button form-button">Add Visitor</button>
+      </form>
 
-<section id="about" class="card">
-  <h2>Assignment Requirement</h2>
-  <p>
-    This page demonstrates a Netlify frontend connected to a Neon database.
-    The homepage shows index.html and provides a downloadable
-    get-visitors.js file as required.
-  </p>
-</section>
+      <div class="action-row">
+        <button id="load-visitors" class="button form-button" type="button">Load Visitors</button>
+      </div>
 
-<section id="visitor-app" class="card">
-  <h2>Visitors App</h2>
+      <p id="status-message" class="status-message"></p>
+      <ul id="visitor-list" class="visitor-list"></ul>
+    </section>
+  </main>
 
-  <form id="visitor-form" class="visitor-form">
-    <input
-      type="text"
-      id="visitor-name"
-      placeholder="Enter visitor name"
-      required
-    />
-    <button class="button form-button">Add Visitor</button>
-  </form>
+  <button id="topBtn" type="button">Back to Top</button>
 
-  <div class="action-row">
-    <button id="load-visitors" class="button form-button">
-      Load Visitors
-    </button>
-  </div>
+  <footer class="footer">
+    <p>Created by Jeshwin William James for CSCI 6343 - Cloud Development</p>
+  </footer>
 
-  <p id="status-message" class="status-message"></p>
+  <script>
+    const visitorForm = document.getElementById('visitor-form');
+    const visitorNameInput = document.getElementById('visitor-name');
+    const loadVisitorsButton = document.getElementById('load-visitors');
+    const visitorList = document.getElementById('visitor-list');
+    const statusMessage = document.getElementById('status-message');
+    const topBtn = document.getElementById('topBtn');
 
-  <ul id="visitor-list" class="visitor-list"></ul>
+    function setStatus(message, isError = false) {
+      statusMessage.textContent = message;
+      statusMessage.style.color = isError ? '#b91c1c' : '#065f46';
+    }
 
-</section>
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    }
 
-</main>
+    async function loadVisitors() {
+      try {
+        setStatus('Loading visitors...');
+        const response = await fetch('/.netlify/functions/get-visitors');
+        const visitors = await response.json();
 
-<button id="topBtn">Top</button>
+        if (!response.ok) {
+          throw new Error(visitors.error || 'Unable to load visitors.');
+        }
 
-<footer class="footer">
-  <p>Created by Jeshwin William James</p>
-</footer>
+        visitorList.innerHTML = '';
 
-<script>
-const visitorForm = document.getElementById('visitor-form');
-const visitorName = document.getElementById('visitor-name');
-const visitorList = document.getElementById('visitor-list');
-const loadBtn = document.getElementById('load-visitors');
-const status = document.getElementById('status-message');
+        if (visitors.length === 0) {
+          visitorList.innerHTML = '<li class="empty-state">No visitors in the database yet.</li>';
+          setStatus('No visitors found.');
+          return;
+        }
 
-function setStatus(msg,error=false){
-status.textContent=msg;
-status.style.color=error?"red":"green";
-}
+        visitors.forEach((visitor) => {
+          const item = document.createElement('li');
+          item.className = 'visitor-item';
+          item.innerHTML = `
+            <div>
+              <strong>${visitor.name}</strong>
+              <p>Visited at: ${formatDate(visitor.visited_at)}</p>
+              <p>ID: ${visitor.id}</p>
+            </div>
+            <button class="delete-btn" data-id="${visitor.id}" type="button">Delete</button>
+          `;
+          visitorList.appendChild(item);
+        });
 
-async function loadVisitors(){
-try{
-setStatus("Loading...");
+        setStatus('Visitors loaded successfully.');
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
 
-const res=await fetch("/.netlify/functions/get-visitors");
-const data=await res.json();
+    visitorForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
 
-visitorList.innerHTML="";
+      try {
+        const name = visitorNameInput.value.trim();
 
-data.forEach(v=>{
-const li=document.createElement("li");
-li.className="visitor-item";
+        if (!name) {
+          setStatus('Please enter a visitor name.', true);
+          return;
+        }
 
-li.innerHTML=`
-<div>
-<strong>${v.name}</strong>
-<p>${new Date(v.visited_at).toLocaleString()}</p>
-</div>
-<button class="delete-btn" data-id="${v.id}">Delete</button>
-`;
+        setStatus('Adding visitor...');
 
-visitorList.appendChild(li);
-});
+        const response = await fetch('/.netlify/functions/add-visitor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name })
+        });
 
-setStatus("Loaded");
-}catch(e){
-setStatus("Error loading visitors",true);
-}
-}
+        const result = await response.json();
 
-visitorForm.addEventListener("submit",async e=>{
-e.preventDefault();
+        if (!response.ok) {
+          throw new Error(result.error || 'Unable to add visitor.');
+        }
 
-try{
-const name=visitorName.value;
+        visitorNameInput.value = '';
+        setStatus(`Visitor added: ${result.name}`);
+        await loadVisitors();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
 
-await fetch("/.netlify/functions/post-visitor",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({name})
-});
+    loadVisitorsButton.addEventListener('click', loadVisitors);
 
-visitorName.value="";
-loadVisitors();
-}catch(e){
-setStatus("Error adding",true);
-}
-});
+    visitorList.addEventListener('click', async function (event) {
+      if (!event.target.classList.contains('delete-btn')) return;
 
-visitorList.addEventListener("click",async e=>{
-if(!e.target.classList.contains("delete-btn"))return;
+      const visitorId = event.target.getAttribute('data-id');
 
-const id=e.target.dataset.id;
+      try {
+        setStatus('Deleting visitor...');
+        const response = await fetch(`/.netlify/functions/delete-visitor?id=${visitorId}`, {
+          method: 'DELETE'
+        });
 
-await fetch(`/.netlify/functions/delete-visitor?id=${id}`,{
-method:"DELETE"
-});
+        const result = await response.json();
 
-loadVisitors();
-});
+        if (!response.ok) {
+          throw new Error(result.error || 'Unable to delete visitor.');
+        }
 
-loadBtn.addEventListener("click",loadVisitors);
+        setStatus(result.message || 'Visitor deleted successfully.');
+        await loadVisitors();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
 
-document.getElementById("topBtn").onclick=()=>{
-window.scrollTo({top:0,behavior:"smooth"});
-};
-</script>
-
+    topBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
 </body>
 </html>
